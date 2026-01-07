@@ -1,35 +1,48 @@
+
+// Consulta.java
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Consulta {
-    public int dia;
-    public int mes;
-    public int año;
-    private String hora;
-    private Paciente paciente;
+    private LocalDateTime fechaHora; 
+    private Paciente paciente; 
     private Medico medico;
     private ServicioMedico servicioMedico;
     private boolean realizada;
     private String diagnostico;
     private String tratamiento;
-    private List<String> examenesMedicos;
 
-    public Consulta(int dia, int mes, int año, String hora, Paciente paciente, Medico medico, ServicioMedico servicioMedico, String diagnostico, String tratamiento, List<String> examenesMedicos) {
-        this.dia = dia;
-        this.mes = mes;
-        this.año = año;
-        this.hora = hora;
-        this.servicioMedico = servicioMedico;
-        this.paciente = paciente;
-        this.medico = medico;
-        this.realizada = false;
+    private final List<String> examenesMedicos;
+
+    public Consulta(LocalDateTime fechaHora,
+            Paciente paciente,
+            Medico medico,
+            ServicioMedico servicioMedico,
+            String diagnostico,
+            String tratamiento,
+            List<String> examenesMedicos) {
+        setFechaHora(fechaHora);
+        setPaciente(paciente);
+        setMedico(medico);
+        setServicioMedico(servicioMedico);
+        setDiagnostico(diagnostico);
+        setTratamiento(tratamiento);
+
+        this.examenesMedicos = new ArrayList<>();
+        if (examenesMedicos != null)
+            this.examenesMedicos.addAll(examenesMedicos);
     }
 
-    public String getHora() {
-        return hora;
+    public LocalDateTime getFechaHora() {
+        return fechaHora;
     }
 
-    public void setHora(String hora) {
-        this.hora = hora;
+    public void setFechaHora(LocalDateTime fechaHora) {
+        if (fechaHora == null)
+            throw new IllegalArgumentException("fechaHora no puede ser null");
+        this.fechaHora = fechaHora;
     }
 
     public Paciente getPaciente() {
@@ -37,6 +50,8 @@ public class Consulta {
     }
 
     public void setPaciente(Paciente paciente) {
+        if (paciente == null)
+            throw new IllegalArgumentException("paciente no puede ser null");
         this.paciente = paciente;
     }
 
@@ -45,7 +60,19 @@ public class Consulta {
     }
 
     public void setMedico(Medico medico) {
+        if (medico == null)
+            throw new IllegalArgumentException("medico no puede ser null");
         this.medico = medico;
+    }
+
+    public ServicioMedico getServicioMedico() {
+        return servicioMedico;
+    }
+
+    public void setServicioMedico(ServicioMedico servicioMedico) {
+        if (servicioMedico == null)
+            throw new IllegalArgumentException("servicioMedico no puede ser null");
+        this.servicioMedico = servicioMedico;
     }
 
     public boolean isRealizada() {
@@ -72,19 +99,17 @@ public class Consulta {
         this.tratamiento = tratamiento;
     }
 
+    // Encapsulate collection:
     public List<String> getExamenesMedicos() {
-        return examenesMedicos;
+        return Collections.unmodifiableList(examenesMedicos);
     }
 
-    public void setExamenesMedicos(List<String> examenesMedicos) {
-        this.examenesMedicos = examenesMedicos;
-    }
-
-    public ServicioMedico getServicioMedico() {
-        return servicioMedico;
-    }
-
-    public void setServicioMedico(ServicioMedico servicioMedico) {
-        this.servicioMedico = servicioMedico;
+    public void agregarExamen(String examen) {
+        if (examen != null && !examen.trim().isEmpty()) {
+            examenesMedicos.add(examen.trim());
+        }
     }
 }
+
+
+
