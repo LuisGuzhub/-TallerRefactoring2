@@ -1,11 +1,11 @@
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class SistemaAtencionMedico {
-    final double descuentoAdultoMayor = 0.25;
-    private List<Paciente> pacientes;
-    private List<Medico> medicos;
-    private List<ServicioMedico> serviciosMedicos;
+    private final List<Paciente> pacientes;
+    private final List<Medico> medicos;
+    private final List<ServicioMedico> serviciosMedicos;
 
     public SistemaAtencionMedico() {
         this.pacientes = new ArrayList<>();
@@ -14,55 +14,66 @@ public class SistemaAtencionMedico {
     }
 
     public void agregarPaciente(Paciente paciente) {
-        pacientes.add(paciente);
+        if (paciente != null)
+            pacientes.add(paciente);
     }
 
     public void agregarMedico(Medico medico) {
-        medicos.add(medico);
+        if (medico != null)
+            medicos.add(medico);
     }
 
     public void agregarServicioMedico(ServicioMedico servicioMedico) {
-        serviciosMedicos.add(servicioMedico);
+        if (servicioMedico != null)
+            serviciosMedicos.add(servicioMedico);
     }
 
-    public void agendarConsulta(Paciente paciente, Consulta consulta){
-        double costoConsulta = consulta.getServicioMedico().getCosto();
-        int edadPaciente = paciente.getEdad();
-        costoConsulta = calcularValorFinalConsulta(costoConsulta,edadPaciente);
-        System.out.println("Se han cobrado "+ costoConsulta+ " dolares de su tarjeta de credito");
-        paciente.historialMedico.getConsultas().add(consulta); //Hacer esto es incorrecto
+    // Encapsulate collection: vistas inmodificables
+    public List<Paciente> getPacientes() {
+        return Collections.unmodifiableList(pacientes);
     }
 
-    public double calcularValorFinalConsulta(double costoConsulta, int edadPaciente){
-        double valorDescontar = 0;
-        if(edadPaciente>=65){
-            valorDescontar = costoConsulta*descuentoAdultoMayor; //0.25 es el descuento para adultos mayores
+    public List<Medico> getMedicos() {
+        return Collections.unmodifiableList(medicos);
+    }
+
+    public List<ServicioMedico> getServiciosMedicos() {
+        return Collections.unmodifiableList(serviciosMedicos);
+    }
+
+    // Parameterize method: un solo "buscarPorNombre" para evitar duplicación.
+    private <T extends Persona> T buscarPorNombre(List<T> lista, String nombre) {
+        if (nombre == null)
+            return null;
+        for (T item : lista) {
+            if (item.getNombre().equalsIgnoreCase(nombre.trim()))
+                return item;
         }
-        return costoConsulta-valorDescontar;
+        return null;
     }
 
-    // se puede parametrizar (obtener...)
     public Paciente obtenerPaciente(String nombrePaciente) {
-        for(Paciente paciente : pacientes){
-            if (paciente.getNombre().equals(nombrePaciente))
-                return paciente;
-        }
-        return null;
-    }
-
-    public ServicioMedico obtenerServicioMedico(String nombreServicio) {
-        for(ServicioMedico servicioMedico : serviciosMedicos){
-            if (servicioMedico.getNombre().equals(nombreServicio))
-                return servicioMedico;
-        }
-        return null;
+        return buscarPorNombre(pacientes, nombrePaciente);
     }
 
     public Medico obtenerMedico(String nombreMedico) {
-        for(Medico medico : medicos){
-            if (medico.getNombre().equals(nombreMedico))
-                return medico;
+        return buscarPorNombre(medicos, nombreMedico);
+    }
+
+    public ServicioMedico obtenerServicioMedico(String nombreServicio) {
+        if (nombreServicio == null)
+            return null;
+        for (ServicioMedico servicio : serviciosMedicos) {
+            if (servicio.getNombre().equalsIgnoreCase(nombreServicio.trim()))
+                return servicio;
         }
         return null;
+    }
+
+    // Remove parameter: el paciente ya va dentro de la consulta.
+    public void agendarConsulta(Consulta consulta) {
+        if (consulta == null)
+            return;
+        consulta.getPaciente().getHistorialMedico().agregarConsulta(consulta);
     }
 }
